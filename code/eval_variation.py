@@ -12,6 +12,15 @@ import opt_nam
 import utils
 import params
 
+# eval on different images and not only one image
+def make_multi_y(batch_size, images):
+    assert(images.shape[2]==images.shape[3]), "Input must be square images"
+    images_idx = np.random.choice(images.shape[0], batch_size, replace=False) 
+    x = np.zeros((batch_size,  images.shape[1], images.shape[2], images.shape[3]))
+    for i in range(batch_size):
+        im = images[images_idx[i]]
+        x[i] = im
+    return x
 
 # Load pretrained unconditional generator for X domain.
 # Change code if you wish to use your own generative model.
@@ -24,10 +33,8 @@ def get_x_generator():
     netG.load_state_dict(state_dict)
     return netG
 
-
 netG = get_x_generator()
 netG.cuda()
-
 
 # load Y domain data. Assumed to be a uint8 numpy array
 # of shape (n, sz, sz, nc)
@@ -37,16 +44,22 @@ def get_y_data():
     data_np = data_np / 255.0
     return data_np
 
-
 y = get_y_data()
 for i in range(y.shape[1]):
     y[:, i:i+1] -= params.mu[i]
     y[:, i:i+1] /= params.sd[i]
 rp = np.random.permutation(y.shape[0])[:params.n_examples]
-image_id = int(sys.argv[1]) % y.shape[0]
-y = y[image_id]
-y = np.tile(y[None, :], (params.batch_size, 1, 1, 1))
 
+## eval_variation execute with no arguments:
+if (len(sys.argv) == 1):
+    print('multi')
+    y = make_multi_y(params.batch_size, y)
+## eval_variation execute with image id as an argument:
+else:
+    print('one')
+    image_id = int(sys.argv[1]) % y.shape[0]
+    y = y[image_id]
+    y = np.tile(y[None, :], (params.batch_size, 1, 1, 1))
 
 def get_transformer(netT_pth):
     netT = utils.transformer(y.shape[2], params.nam_ngf,
@@ -54,7 +67,6 @@ def get_transformer(netT_pth):
     state_dict = torch.load(netT_pth)
     netT.load_state_dict(state_dict)
     return netT
-
 
 netT = get_transformer(params.transformer_cp_path)
 netT.cuda()
