@@ -248,7 +248,7 @@ class _netT64(nn.Module):
                 'dim':64,
                 'activ':'relu',
                 'n_downsample':2, # try it equal to 0
-                'n_res':4, # try another numbers
+                'n_res':4, # try other numbers
                 'pad_type':'reflect'
             }
         }
@@ -269,7 +269,7 @@ class _netT32(nn.Module):
                 'dim':64,
                 'activ':'relu',
                 'n_downsample':0,
-                'n_res':4, # try another numbers
+                'n_res':4, # try other numbers
                 'pad_type':'reflect'
             }
         }
