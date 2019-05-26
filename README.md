@@ -7,6 +7,7 @@ The architectures which were examined are:
 1. DiscoGAN from https://github.com/SKTBrain/DiscoGAN
 2. UNIT from https://github.com/mingyuliutw/UNIT
 3. UNET from https://github.com/milesial/Pytorch-UNet
+
 From each of the above I took the network architecture, and used it to replace the architecture
 in the file conditional.py in the NAM project. Then I trained the program,
 and tested the trained network on multiple images, using the eval_variation.py code.
